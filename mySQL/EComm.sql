@@ -16,6 +16,30 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `Customers`
+--
+
+DROP TABLE IF EXISTS `Customers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `Customers` (
+  `customerId` int(11) NOT NULL,
+  PRIMARY KEY (`customerId`),
+  UNIQUE KEY `customerId_UNIQUE` (`customerId`),
+  CONSTRAINT `fk_Customers_Users1` FOREIGN KEY (`customerId`) REFERENCES `users` (`userid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Customers`
+--
+
+LOCK TABLES `Customers` WRITE;
+/*!40000 ALTER TABLE `Customers` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Customers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `LineOrders`
 --
 
@@ -29,8 +53,8 @@ CREATE TABLE `LineOrders` (
   PRIMARY KEY (`orderId`,`productId`),
   UNIQUE KEY `orderId_UNIQUE` (`orderId`),
   UNIQUE KEY `productId_UNIQUE` (`productId`),
-  CONSTRAINT `orderId_fk` FOREIGN KEY (`orderId`) REFERENCES `orders` (`orderid`),
-  CONSTRAINT `productId_fk` FOREIGN KEY (`productId`) REFERENCES `products` (`productid`)
+  CONSTRAINT `fk_LineOrders_Orders1` FOREIGN KEY (`orderId`) REFERENCES `orders` (`orderid`),
+  CONSTRAINT `fk_LineOrders_Products1` FOREIGN KEY (`productId`) REFERENCES `products` (`productid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -53,11 +77,11 @@ DROP TABLE IF EXISTS `Orders`;
 CREATE TABLE `Orders` (
   `orderId` int(11) NOT NULL AUTO_INCREMENT,
   `orderDate` datetime NOT NULL,
-  `customerId` int(11) NOT NULL,
-  PRIMARY KEY (`orderId`,`customerId`),
+  `customer` int(11) NOT NULL,
+  PRIMARY KEY (`orderId`),
   UNIQUE KEY `orderId_UNIQUE` (`orderId`),
-  UNIQUE KEY `customerId_UNIQUE` (`customerId`),
-  CONSTRAINT `customerId_fk` FOREIGN KEY (`customerId`) REFERENCES `users` (`userid`)
+  UNIQUE KEY `customer_UNIQUE` (`customer`),
+  CONSTRAINT `fk_Orders_Customers1` FOREIGN KEY (`customer`) REFERENCES `customers` (`customerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -83,8 +107,11 @@ CREATE TABLE `Products` (
   `unitPrice` int(11) unsigned NOT NULL,
   `availableQuantity` int(11) unsigned NOT NULL,
   `productImage` varchar(2048) DEFAULT NULL,
+  `productSeller` int(11) NOT NULL,
   PRIMARY KEY (`productId`),
-  UNIQUE KEY `productId_UNIQUE` (`productId`)
+  UNIQUE KEY `productId_UNIQUE` (`productId`),
+  UNIQUE KEY `productSeller_UNIQUE` (`productSeller`),
+  CONSTRAINT `fk_Products_Sellers1` FOREIGN KEY (`productSeller`) REFERENCES `sellers` (`sellerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -98,53 +125,28 @@ LOCK TABLES `Products` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Roles`
+-- Table structure for table `Sellers`
 --
 
-DROP TABLE IF EXISTS `Roles`;
+DROP TABLE IF EXISTS `Sellers`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
-CREATE TABLE `Roles` (
-  `roleId` int(11) NOT NULL AUTO_INCREMENT,
-  `roleName` varchar(45) NOT NULL,
-  PRIMARY KEY (`roleId`)
+CREATE TABLE `Sellers` (
+  `sellerId` int(11) NOT NULL,
+  `companyName` varchar(45) NOT NULL,
+  PRIMARY KEY (`sellerId`),
+  UNIQUE KEY `sellerId_UNIQUE` (`sellerId`),
+  CONSTRAINT `fk_Sellers_Users1` FOREIGN KEY (`sellerId`) REFERENCES `users` (`userid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Roles`
+-- Dumping data for table `Sellers`
 --
 
-LOCK TABLES `Roles` WRITE;
-/*!40000 ALTER TABLE `Roles` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Roles` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `UserRoles`
---
-
-DROP TABLE IF EXISTS `UserRoles`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
-CREATE TABLE `UserRoles` (
-  `userId` int(11) NOT NULL,
-  `roleId` int(11) NOT NULL,
-  PRIMARY KEY (`userId`,`roleId`),
-  UNIQUE KEY `userId_UNIQUE` (`userId`),
-  UNIQUE KEY `roleId_UNIQUE` (`roleId`),
-  CONSTRAINT `roleId_fk` FOREIGN KEY (`roleId`) REFERENCES `roles` (`roleid`),
-  CONSTRAINT `userId_fk` FOREIGN KEY (`userId`) REFERENCES `users` (`userid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `UserRoles`
---
-
-LOCK TABLES `UserRoles` WRITE;
-/*!40000 ALTER TABLE `UserRoles` DISABLE KEYS */;
-/*!40000 ALTER TABLE `UserRoles` ENABLE KEYS */;
+LOCK TABLES `Sellers` WRITE;
+/*!40000 ALTER TABLE `Sellers` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Sellers` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -161,9 +163,11 @@ CREATE TABLE `Users` (
   `email` varchar(100) NOT NULL,
   `address` varchar(100) DEFAULT NULL,
   `passwordHash` varchar(100) NOT NULL,
+  `userType` varchar(45) NOT NULL,
   PRIMARY KEY (`userId`),
   UNIQUE KEY `userId_UNIQUE` (`userId`),
-  UNIQUE KEY `email_UNIQUE` (`email`)
+  UNIQUE KEY `email_UNIQUE` (`email`),
+  UNIQUE KEY `userType_UNIQUE` (`userType`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -185,4 +189,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-08-14 16:20:11
+-- Dump completed on 2019-08-15 12:07:47
