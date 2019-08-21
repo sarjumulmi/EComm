@@ -14,12 +14,13 @@ const sequelize = new Sequelize('EComm', 'root', 'Oracle123', {
 
 const User = UserModel(sequelize, Sequelize)
 
+const email = 's@m.com'
 sequelize.sync({
     force: false
   })
   .then(() => {
     console.log(`Database & tables created!`)
-    // User.findAll().then(users => console.log(users));
+    // User.findOne({where: {email}}).then(user => console.log(user));
   })
 
 module.exports = {
