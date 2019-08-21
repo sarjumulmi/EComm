@@ -70,7 +70,7 @@ passport.use(
         User.findOne({
           where: {
             email
-          }.then(user => {
+          }}).then(user => {
             if (user === null) {
               return done(null, false, {
                 message: 'Incorrect Username'
@@ -88,7 +88,6 @@ passport.use(
               })
             }
           })
-        })
       } catch (error) {
         done(error)
       }
