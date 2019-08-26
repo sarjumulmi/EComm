@@ -33,3 +33,9 @@ func GetProducts(db *sql.DB) ([]Product, error) {
 	}
 	return products, nil
 }
+
+// GetProduct get a product
+func (p *Product) GetProduct(db *sql.DB) error {
+	stmt := fmt.Sprintf("SELECT * from Product WHERE productId=%d", p.ProductID)
+	return db.QueryRow(stmt).Scan(&p.ProductID, &p.ProductName, &p.UnitPrice, &p.AvailableQuantity, &p.ProductImage, &p.ProductSeller)
+}
