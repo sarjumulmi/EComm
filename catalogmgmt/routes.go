@@ -55,3 +55,25 @@ func (a *App) createProduct(w http.ResponseWriter, r *http.Request) {
 	}
 	utils.RespondWithJSON(w, http.StatusCreated, p)
 }
+
+func (a *App) updateProduct(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	productID, err := strconv.Atoi(vars["productId"])
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, "invalid product id")
+		return
+	}
+	var p models.Product
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&p); err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, "invalid request payload")
+		return
+	}
+	defer r.Body.Close()
+	p.ProductID = productID
+	if err := p.UpdateProduct(a.DB); err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	utils.RespondWithJSON(w, http.StatusOK, p)
+}

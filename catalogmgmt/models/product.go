@@ -53,3 +53,13 @@ func (p *Product) CreateProduct(db *sql.DB) error {
 	}
 	return nil
 }
+
+// UpdateProduct ...
+func (p *Product) UpdateProduct(db *sql.DB) error {
+	stmt := fmt.Sprintf("UPDATE product SET productName = '%s', unitPrice='%d', availableQuantity='%d', productImage='%s', productSeller='%d' WHERE productId='%d'", p.ProductName, p.UnitPrice, p.AvailableQuantity, p.ProductImage, p.ProductSeller, p.ProductID)
+	_, err := db.Exec(stmt)
+	if err != nil {
+		return err
+	}
+	return nil
+}

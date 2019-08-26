@@ -20,6 +20,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/products", a.getProducts).Methods("GET")
 	a.Router.HandleFunc("/products/{productId}", a.getProduct).Methods("GET")
 	a.Router.HandleFunc("/products", a.createProduct).Methods("POST")
+	a.Router.HandleFunc("/products/{productId}", a.updateProduct).Methods("PUT")
 }
 
 // Initialize DB
