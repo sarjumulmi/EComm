@@ -6,7 +6,7 @@ import (
 )
 
 // Product ...
-type product struct {
+type Product struct {
 	ProductID         int    `json:"productId"`
 	ProductName       string `json:"productName"`
 	ProductImage      string `json:"productImage"`
@@ -16,17 +16,17 @@ type product struct {
 }
 
 // GetProducts ...
-func GetProducts(db *sql.DB) ([]product, error) {
+func GetProducts(db *sql.DB) ([]Product, error) {
 	stmt := fmt.Sprintf("SELECT * from Product")
 	rows, err := db.Query(stmt)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	products := []product{}
+	products := []Product{}
 	for rows.Next() {
-		var p product
-		if err := rows.Scan(&p.ProductID, &p.ProductName, &p.ProductImage, &p.AvailableQuantity, &p.UnitPrice, &p.ProductSeller); err != nil {
+		var p Product
+		if err := rows.Scan(&p.ProductID, &p.ProductName, &p.UnitPrice, &p.AvailableQuantity, &p.ProductImage, &p.ProductSeller); err != nil {
 			return nil, err
 		}
 		products = append(products, p)
