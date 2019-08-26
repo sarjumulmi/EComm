@@ -39,3 +39,17 @@ func (p *Product) GetProduct(db *sql.DB) error {
 	stmt := fmt.Sprintf("SELECT * from Product WHERE productId=%d", p.ProductID)
 	return db.QueryRow(stmt).Scan(&p.ProductID, &p.ProductName, &p.UnitPrice, &p.AvailableQuantity, &p.ProductImage, &p.ProductSeller)
 }
+
+// CreateProduct get a product
+func (p *Product) CreateProduct(db *sql.DB) error {
+	stmt := fmt.Sprintf("INSERT INTO product(productId, productName, unitPrice, availableQuantity, productImage, productSeller) values(null, '%s', '%d', '%d', '%s', '%d')", p.ProductName, p.UnitPrice, p.AvailableQuantity, p.ProductImage, p.ProductSeller)
+	_, err := db.Exec(stmt)
+	if err != nil {
+		return err
+	}
+	err = db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&p.ProductID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

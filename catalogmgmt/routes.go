@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -38,4 +39,19 @@ func (a *App) getProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	utils.RespondWithJSON(w, http.StatusOK, p)
+}
+
+func (a *App) createProduct(w http.ResponseWriter, r *http.Request) {
+	var p models.Product
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&p); err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, "invalid request paylod")
+		return
+	}
+	defer r.Body.Close()
+	if err := p.CreateProduct(a.DB); err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	utils.RespondWithJSON(w, http.StatusCreated, p)
 }
