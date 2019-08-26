@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,6 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/sarjumulmi/ecomm/catalogmgmt/models"
+	"github.com/sarjumulmi/ecomm/catalogmgmt/utils"
 )
 
 // App ...
@@ -24,7 +24,7 @@ func (a *App) initializeRoutes() {
 
 // Initialize DB
 func (a *App) Initialize(user, pwd, dbname string) {
-	connectionString := fmt.Sprintf("%s:%s@%s", user, pwd, dbname)
+	connectionString := fmt.Sprintf("%s:%s@/%s", user, pwd, dbname)
 	var err error
 	a.DB, err = sql.Open("mysql", connectionString)
 	if err != nil {
@@ -37,22 +37,10 @@ func (a *App) Initialize(user, pwd, dbname string) {
 func (a *App) getProducts(w http.ResponseWriter, r *http.Request) {
 	products, err := models.GetProducts(a.DB)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJSON(w, http.StatusOK, products)
-}
-
-// utils
-func respondWithError(w http.ResponseWriter, code int, message string) {
-	respondWithJSON(w, code, map[string]string{"error": message})
-}
-
-func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	response, _ := json.Marshal(payload)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	w.Write(response)
+	utils.RespondWithJSON(w, http.StatusOK, products)
 }
 
 // Run server
